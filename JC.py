@@ -9,7 +9,7 @@ def get_order(omega_r, qubit_energy_list):
     Use the bare energy of the system as reference.
 
     Args:
-        womega_r (float): Resonator frequency
+        omega_r (float): Resonator frequency
         qubit_energy_list (List[float]): Qubit energies
 
     Returns:
@@ -121,7 +121,7 @@ def get_qubit_transitions(eigen_energies):
     # Maximum number of photons, maximum number of transmon levels
     nmax, tmax = len(eigen_energies), len(eigen_energies[0])
     transitions = [np.array([eigen_energies[n+q+1,q+1] - eigen_energies[n+q,q]
-                   for n in range(q, nmax-q-1)])
+                   for n in range(0, nmax-q-1)])
                    for q in range(tmax-1)]
 
     # transitions[q][n] is the qubit transition frequency between qubit levels
@@ -138,7 +138,7 @@ def get_res_response(eigen_energies):
     # Maximum number of photons, maximum number of transmon levels
     nmax, tmax = len(eigen_energies), len(eigen_energies[0])
     response = [np.array([eigen_energies[n+q+1,q] - eigen_energies[n+q,q]
-                for n in range(q, nmax-q-1)])
+                for n in range(0, nmax-q-1)])
                 for q in range(tmax)]
 
     #response[q][n] is the resonator frequency at 'n' photons when the qubit is
