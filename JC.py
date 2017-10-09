@@ -75,7 +75,7 @@ def get_qubit_transitions(eigen_energies):
     eigen_energies: eigenenergies produced by the diagonalize_ladder(params)
     """
     nmax, tmax = len(eigen_energies), len(eigen_energies[0]) #Maximum number of photons, maximum number of transmon levels
-    transitions = [np.array([eigen_energies[n+q+1,q+1] - eigen_energies[n+q,q] for n in range(q, nmax-q-1)]) for q in range(tmax-1)]
+    transitions = [np.array([eigen_energies[n+q+1,q+1] - eigen_energies[n+q,q] for n in range(0, nmax-q-1)]) for q in range(tmax-1)]
     
     #transitions[q][n] is the qubit transition frequency between qubit levels 'q+1' and 'q' (omega_{q+1,q}) at 'n' photons
     return transitions
@@ -86,7 +86,7 @@ def get_res_response(eigen_energies):
     eigen_energies: eigenenergies produced by the diagonalize_ladder(params)
     """
     nmax, tmax = len(eigen_energies), len(eigen_energies[0]) #Maximum number of photons, maximum number of transmon levels
-    response = [np.array([eigen_energies[n+q+1,q] - eigen_energies[n+q,q] for n in range(q, nmax-q-1)]) for q in range(tmax)]
+    response = [np.array([eigen_energies[n+q+1,q] - eigen_energies[n+q,q] for n in range(0, nmax-q-1)]) for q in range(tmax)]
     
     #response[q][n] is the resonator frequency at 'n' photons when the qubit is in state 'q'
     return response
