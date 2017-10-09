@@ -105,7 +105,7 @@ def get_fan_diagram(eigen_energies, omega_r):
     # Maximum number of photons, maximum number of transmon levels
     nmax, tmax = len(eigen_energies), len(eigen_energies[0])
     fan = [np.array([eigen_energies[n,q] - n*omega_r
-           for n in range(q, nmax)])
+           for n in range(0, nmax)])
            for q in range(tmax)]
 
     #fan[q][n] is the 'q'th level fan diagram energy at 'n' photons
