@@ -157,7 +157,7 @@ def transmon_perturbative(tmax, omega_q, eta, g):
         g (float): coupling normalization. Value of the coupling between levels
             0 and 1.
     """
-    qubit_energy_list = [(omega_q*q -
+    qubit_energy_list = [omega_q*q -
                           q*(q-1)/2*eta -
                           q*(q-1)*(q-2)/4*eta**2/omega_q
                           for q in range(tmax)]
