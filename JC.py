@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import minimize
 import math
 
 """Diagonalize the Jaynes-Cummings ladder of energies"""
@@ -118,6 +119,7 @@ def get_qubit_transitions(eigen_energies):
         eigen_energies (List[float]): eigenenergies produced by the
             diagonalize_ladder(params)
     """
+
     # Maximum number of photons, maximum number of transmon levels
     nmax, tmax = len(eigen_energies), len(eigen_energies[0])
     transitions = [np.array([eigen_energies[n+q+1,q+1] - eigen_energies[n+q,q]
@@ -165,4 +167,40 @@ def transmon_perturbative(tmax, omega_q, eta, g):
     
     #qubit_energy_list[q] is transmon energy for level 'q'
     #g_list[q] is transmon charge matrix element between levels 'q+1' and 'q'
+    return [qubit_energy_list, g_list]
+
+
+def transmon_numerical(tmax, omega_q, eta, g, qmax=20):
+    nmax = 2*qmax + 1
+    n = np.diag([i for i in range(-qmax, qmax + 1)])
+    # charge displacement operator by 1
+    d1 = np.diag([1 for i in range(1, nmax)], -1)
+
+    def get_h(EC, EJ):
+        H = 4*EC*(n @ n) -EJ*(d1 + d1.T)/2
+        return H
+
+    def obj_function(params, *args):
+        omega_q, eta = args
+        EC, EJ = params
+        H = get_h(EC, EJ)
+        e = np.linalg.eigh(H)[0]
+        omega_q_calc = e[1]-e[0]
+        eta_calc = (e[1]-e[0]) - (e[2]-e[1])
+        return (omega_q_calc - omega_q)**2 + (eta_calc - eta)**2
+    # find appropriate EC and EJ to give the desired frequency and anharmonicity
+    sol = minimize(obj_function, [0.2, 20], args=(omega_q, eta),
+                   method='Nelder-Mead', tol=1e-16)
+    EC, EJ = sol.x
+
+    H = get_h(EC, EJ)
+    e, v = np.linalg.eigh(H)
+
+    qubit_energy_list = e[0:tmax] - e[0]
+    g_norm = v[:,0].T.conj() @ n @ v[:,1]
+    # taking absolute value by hand here
+    g_list = np.array([g/g_norm*np.abs(v[:,q].T.conj() @ n @ v[:,q+1])
+                       for q in range(tmax-1)])
+    # qubit_energy_list[q] is transmon energy for level 'q'
+    # g_list[q] is transmon charge matrix element between levels 'q+1' and 'q'
     return [qubit_energy_list, g_list]
